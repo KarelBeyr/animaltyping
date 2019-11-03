@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
+import UIfx from 'uifx'
+
+const bell = new UIfx(require("./res/bump.mp3"))
+const applause = new UIfx(require("./res/applause.mp3"))
 
 interface GameState {
   patternIndex: number
@@ -19,17 +23,24 @@ class Game extends Component<GameProps, GameState> {
   render() {
     return <div className="App" onKeyDown={this.handleKeyDown} onKeyPress={this.handleKeyPress} tabIndex={0}>
         <div id="imageDiv" />
-        <PatternPage pattern={this.props.patterns[this.state.patternIndex].toUpperCase()} />
-        <InputPage pattern={this.props.patterns[this.state.patternIndex].toUpperCase()} value={this.state.value} />
+        <PatternPage pattern={this.props.patterns[this.state.patternIndex]} />
+        <InputPage pattern={this.props.patterns[this.state.patternIndex]} value={this.state.value} />
       </div>
   }
   handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.keyCode === 8) {
+    if (e.keyCode === 8) {  //backspace
       this.setState({value: this.state.value.slice(0, -1)});
     }
+    bell.play()
   }
   handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    this.setState({value: this.state.value + String.fromCharCode(e.charCode).toUpperCase()});
+    const newValue = this.state.value + String.fromCharCode(e.charCode).toUpperCase()
+    this.setState({value: newValue});
+    if (newValue === this.props.patterns[this.state.patternIndex])
+    {
+      applause.play()
+    }
+    console.log(`${newValue} ?= ${this.props.patterns[this.state.patternIndex]}`)
   }
 }
 
@@ -63,7 +74,7 @@ export class PatternPage extends Component<PatternPageProps> {
 
 const App: React.FC = () => {
   return (
-    <Game patterns={["dog", "cat"]} />
+    <Game patterns={["dog", "cat"].map(_ => _.toUpperCase())} />
   );
 }
 
