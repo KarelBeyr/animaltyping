@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import UIfx from 'uifx'
+import { S_IFBLK } from 'constants';
 
 const bell = new UIfx(require("./res/bump.mp3"))
 const applause = new UIfx(require("./res/applause.mp3"))
@@ -20,27 +21,53 @@ class Game extends Component<GameProps, GameState> {
     this.state = { patternIndex: 0, value: "" };
   }
 
+  componentDidMount() {
+    document.addEventListener('keydown', this.handleKeyDown);
+    document.addEventListener('keypress', this.handleKeyPress);
+  }
+  componentWillUnmount()
+  {
+    document.removeEventListener('keydown', this.handleKeyDown)
+    document.removeEventListener('keypress', this.handleKeyPress)
+  }
   render() {
-    return <div className="App" onKeyDown={this.handleKeyDown} onKeyPress={this.handleKeyPress} tabIndex={0}>
-        <div id="imageDiv" />
-        <PatternPage pattern={this.props.patterns[this.state.patternIndex]} />
-        <InputPage pattern={this.props.patterns[this.state.patternIndex]} value={this.state.value} />
+    const pattern = this.props.patterns[this.state.patternIndex]
+    return <div className="App" tabIndex={0}>
+        <div id="imageDiv" >
+          <img src={require(`./res/${pattern.toLowerCase()}.jpg`)} alt={pattern} />
+        </div>
+        <div id="patternAndInput">
+          {pattern}
+          <br />  
+          <InputPage pattern={pattern} value={this.state.value} />
+        </div>
       </div>
   }
-  handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.keyCode === 8) {  //backspace
+
+  handleKeyDown = (e: KeyboardEvent) => {
+      if (e.keyCode === 8) {  //backspace
       this.setState({value: this.state.value.slice(0, -1)});
     }
     bell.play()
   }
-  handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
+
+  isAlphanum(code: number): boolean {
+    return ((code > 47) && (code < 58)) ||
+      code == 32 ||
+      ((code > 64) && (code < 91)) ||
+      ((code > 95) && (code < 112))
+  }
+
+  handleKeyPress = (e: KeyboardEvent) => {
+    if (!this.isAlphanum(e.charCode)) return;
+
     const newValue = this.state.value + String.fromCharCode(e.charCode).toUpperCase()
     this.setState({value: newValue});
     if (newValue === this.props.patterns[this.state.patternIndex])
     {
       applause.play()
+      this.setState({patternIndex: this.state.patternIndex + 1, value: ""});
     }
-    console.log(`${newValue} ?= ${this.props.patterns[this.state.patternIndex]}`)
   }
 }
 
@@ -51,30 +78,20 @@ interface InputPageProps {
 
 export class InputPage extends Component<InputPageProps> {
   render() {
-    return <div  >
+    return <span id="input">
       {this.props.value.split("").map((char, idx) => {
         return <span key={idx} className={this.props.value[idx] === this.props.pattern[idx] ? "ok" : "wrong"}>{char}</span>
       })}
-    </div>
-  }
-
-}
-
-interface PatternPageProps {
-  pattern: string
-}
-
-export class PatternPage extends Component<PatternPageProps> {
-  render() {
-    return <div id="templateDiv" >
-      {this.props.pattern}
-    </div>
+    </span>
   }
 }
 
 const App: React.FC = () => {
   return (
-    <Game patterns={["dog", "cat"].map(_ => _.toUpperCase())} />
+    <Game patterns={["a dog", "a cat", "a bird", "a horse", "a snake",
+      "a cow", "an elephant", "a fish", "an octopus", "a butterfly", "a lion", "a rabbit",
+      "a pig", "a slug", "a snail"].map(_ => _.toUpperCase())} 
+    />
   );
 }
 
