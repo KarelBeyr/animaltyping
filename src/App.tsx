@@ -9,6 +9,7 @@ const applause = new UIfx(require("./res/applause.mp3"))
 interface GameState {
   patternIndex: number
   value: string
+  overlayDisplay: string
 }
 
 interface GameProps {
@@ -18,7 +19,8 @@ interface GameProps {
 class Game extends Component<GameProps, GameState> {
   constructor(props: GameProps) {
     super(props);
-    this.state = { patternIndex: 0, value: "" };
+    this.state = { patternIndex: 0, value: "", overlayDisplay: "hidden" };
+    this.next = this.next.bind(this);
   }
 
   componentDidMount() {
@@ -33,6 +35,7 @@ class Game extends Component<GameProps, GameState> {
   render() {
     const pattern = this.props.patterns[this.state.patternIndex]
     return <div className="App" tabIndex={0}>
+        <OverlayImage pattern={pattern} className={this.state.overlayDisplay} />
         <div id="imageDiv" >
           <img src={require(`./res/${pattern.toLowerCase()}.jpg`)} alt={pattern} />
         </div>
@@ -55,7 +58,15 @@ class Game extends Component<GameProps, GameState> {
     return ((code > 47) && (code < 58)) ||
       code == 32 ||
       ((code > 64) && (code < 91)) ||
-      ((code > 95) && (code < 112))
+      ((code > 95) && (code < 123)) //a-z
+  }
+
+  next() {
+    let newPi = this.state.patternIndex + 1
+    if (newPi >= this.props.patterns.length) newPi = 0
+    this.setState({patternIndex: newPi, value: "", overlayDisplay: "hidden"});
+    const pattern = this.props.patterns[newPi].toLowerCase()
+    new UIfx(require(`./res/${pattern}.mp3`)).play()
   }
 
   handleKeyPress = (e: KeyboardEvent) => {
@@ -66,8 +77,23 @@ class Game extends Component<GameProps, GameState> {
     if (newValue === this.props.patterns[this.state.patternIndex])
     {
       applause.play()
-      this.setState({patternIndex: this.state.patternIndex + 1, value: ""});
+
+      this.setState({patternIndex: this.state.patternIndex, value: "", overlayDisplay: "show"});
+      setTimeout(this.next, 5000)
     }
+  }
+}
+
+interface OverlayImageProps {
+  pattern: string
+  className: string
+}
+
+export class OverlayImage extends Component<OverlayImageProps> {
+  render() {
+    return <div className={`overlay ${this.props.className}`}>
+      <img src={require(`./res/${this.props.pattern.toLowerCase()}.gif`)} alt={this.props.pattern} />
+    </div>
   }
 }
 

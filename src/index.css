@@ -7,7 +7,7 @@ body {
   text-align: center;
 }
 
-.App {
+.App, .overlay {
   position:absolute;
   top:0;
   left:0;
@@ -15,6 +15,18 @@ body {
   right:0;
   height:100%;
   width:100%;
+}
+
+.overlay {
+  z-index: 1;
+  background: violet;
+}
+.overlay > img {
+  height: 100%; width: 100%; object-fit: contain;
+}
+
+.hidden {
+  display: none;
 }
 
 .ok {
