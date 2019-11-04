@@ -45,7 +45,9 @@ body {
 #imageDiv > img {
   max-width: 100%;
   max-height: 100%;
+  /* filter: contrast(0.2) brightness(1.7); */
 }
+  
 
 #patternAndInput {
   display:inline-block;
