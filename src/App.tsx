@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './App.css';
 import UIfx from 'uifx'
-import { S_IFBLK } from 'constants';
 
 const bell = new UIfx(require("./res/bump.mp3"))
 const applause = new UIfx(require("./res/applause.mp3"))
@@ -79,7 +78,7 @@ class Game extends Component<GameProps, GameState> {
       applause.play()
 
       this.setState({patternIndex: this.state.patternIndex, value: "", overlayDisplay: "show"});
-      setTimeout(this.next, 5000)
+      setTimeout(this.next, 6500)
     }
   }
 }
@@ -106,7 +105,9 @@ export class InputPage extends Component<InputPageProps> {
   render() {
     return <span id="input">
       {this.props.value.split("").map((char, idx) => {
-        return <span key={idx} className={this.props.value[idx] === this.props.pattern[idx] ? "ok" : "wrong"}>{char}</span>
+        return <span key={idx} className={this.props.value[idx] === this.props.pattern[idx] ? "ok" : "wrong"}>{ 
+          (char === " ") ? '\u00A0' : char    //fix "invisible" double space 
+        }</span>
       })}
     </span>
   }
