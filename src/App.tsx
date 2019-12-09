@@ -115,7 +115,7 @@ export class InputPage extends Component<InputPageProps> {
 
 const App: React.FC = () => {
   return (
-    <Game patterns={["a dog", "a cat", "a bird", "a horse", "a snake",
+    <Game patterns={["a dog", "a red dog", "a blue dog", "a green dog", "a deer", "a fox", "a giraffe", "a mouse", "a donkey", "a mole", "a cat", "a bird", "a horse", "a snake",
       "a cow", "an elephant", "a fish", "an octopus", "a butterfly", "a lion", "a rabbit",
       "a pig", "a slug", "a snail"].map(_ => _.toUpperCase())} 
     />
