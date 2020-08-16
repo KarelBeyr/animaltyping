@@ -13,6 +13,7 @@ interface GameState {
 
 interface GameProps {
   patterns: string[]
+  known: string[]
 }
 
 class Game extends Component<GameProps, GameState> {
@@ -39,7 +40,7 @@ class Game extends Component<GameProps, GameState> {
           <img src={require(`./res/${pattern.toLowerCase()}.jpg`)} alt={pattern} />
         </div>
         <div id="patternAndInput">
-          {pattern}
+          {this.props.known.find(_ => _ === pattern) === undefined ? pattern : ""}
           <br />  
           <InputPage pattern={pattern} value={this.state.value} />
         </div>
@@ -47,15 +48,16 @@ class Game extends Component<GameProps, GameState> {
   }
 
   handleKeyDown = (e: KeyboardEvent) => {
-      if (e.keyCode === 8) {  //backspace
+    if (e.keyCode === 8) {  //backspace
       this.setState({value: this.state.value.slice(0, -1)});
+      e.preventDefault();
     }
     bell.play()
   }
 
   isAlphanum(code: number): boolean {
     return ((code > 47) && (code < 58)) ||
-      code == 32 ||
+      code === 32 ||
       ((code > 64) && (code < 91)) ||
       ((code > 95) && (code < 123)) //a-z
   }
@@ -115,9 +117,10 @@ export class InputPage extends Component<InputPageProps> {
 
 const App: React.FC = () => {
   return (
-    <Game patterns={["a dog", "a red dog", "a blue dog", "a green dog", "a deer", "a fox", "a giraffe", "a mouse", "a donkey", "a mole", "a cat", "a bird", "a horse", "a snake",
+    //"a red dog", "a blue dog", "a green dog"
+    <Game patterns={["a dog", "a deer", "a fox", "a giraffe", "a mouse", "a donkey", "a mole", "a cat", "a bird", "a horse", "a snake",
       "a cow", "an elephant", "a fish", "an octopus", "a butterfly", "a lion", "a rabbit",
-      "a pig", "a slug", "a snail"].map(_ => _.toUpperCase())} 
+      "a pig", "a slug", "a snail"].map(_ => _.toUpperCase())} known={[]/*["a dog"].map(_ => _.toUpperCase())*/} 
     />
   );
 }
